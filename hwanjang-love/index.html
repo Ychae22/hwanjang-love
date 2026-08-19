@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>환장연애 (EXChange) — 안전한 치유와 위로의 대나무숲</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- ================= TOP NAVIGATION BAR ================= -->
+<div class="top-nav-bar">
+  <button class="btn-settings-toggle" id="btnOpenSidebar" title="서비스 안내 및 설정 열기">
+    <span>⚙️</span>
+    <span>서비스 안내 & 설정</span>
+  </button>
+</div>
+
+<div class="app-layout">
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="main-content">
+
+    <!-- Top Logo Banner -->
+    <header class="hero-header">
+      <div class="logo-container">
+        <img src="assets/hwanjang_logo.png" alt="환장연애 EXChange 로고" class="logo-image" />
+      </div>
+
+      <!-- Transit Stepper Metaphor Bar -->
+      <div class="transit-metaphor-bar">
+        <div class="station-pill ex" title="과거의 아픔과 잊지 못할 사연을 털어놓는 첫 단계">
+          <span class="station-dot">1</span>
+          <span>eX 과거 사연 털어놓기</span>
+        </div>
+        <span class="station-arrow">➔</span>
+        <div class="station-pill current" title="안전하게 경청하고 위로받는 치유의 공간">
+          <span class="station-dot">2</span>
+          <span>환장연애 안전 대나무숲</span>
+        </div>
+        <span class="station-arrow">➔</span>
+        <div class="station-pill next" title="상처를 딛고 건강한 자존감으로 나아가는 출구">
+          <span class="station-dot">3</span>
+          <span>New 치유와 새로운 시작</span>
+        </div>
+      </div>
+      <p class="hero-subtitle">남에게 쉽게 말 못할 연애의 상처와 고민, 안전하게 털어놓고 위로받으세요.</p>
+    </header>
+
+    <!-- SECTION 1: Story Submission Area (Clean & Focused) -->
+    <section class="story-write-card">
+      <div class="card-header-bar">
+        <div class="card-title-group">
+          <h3 class="card-main-title">연애 사연 접수하기</h3>
+        </div>
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: 500;">🛡️ 100% 익명 보호</span>
+      </div>
+
+      <div class="textarea-wrapper">
+        <textarea 
+          id="storyInput" 
+          class="story-textarea" 
+          placeholder="남에게 쉽게 털어놓지 못한 연애의 상처나 고민, 기막힌 에피소드를 솔직하게 적어보세요. (예: 이별 후 집 앞을 서성이는 전 연인 때문에 무섭습니다 / 3년 만난 전남친이 잠수이별 후 환승했는데 너무 억울해요)"
+          maxlength="2000"></textarea>
+        <span class="char-counter" id="charCounter">0 / 2000자</span>
+      </div>
+
+      <!-- CATEGORY SELECTION (Prominent 2-Tab Selector) -->
+      <div class="write-category-selector-box">
+        <label class="write-cat-header-label">📌 사연 등록 공간 선택:</label>
+        <div class="write-category-btn-group">
+          <button type="button" class="write-cat-btn active spicy" id="btnWriteSpicy" data-cat="spicy">
+            <span class="write-cat-icon">🔥</span>
+            <div class="write-cat-text">
+              <b>매운맛 썰</b>
+              <span>일반 하소연 / 공감·위로</span>
+            </div>
+          </button>
+          <button type="button" class="write-cat-btn sos" id="btnWriteSos" data-cat="sos">
+            <span class="write-cat-icon">🚨</span>
+            <div class="write-cat-text">
+              <b>SOS 안전 상담소</b>
+              <span>가스라이팅 / 위험 징후</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- USER PROTECTION & SECURITY CONTROLS -->
+      <div class="protection-controls-row">
+        <!-- Secret Post Toggle -->
+        <div class="protection-item">
+          <label class="toggle-switch-label">
+            <span>🔒 나만 보기 (비밀글)</span>
+            <span class="toggle-switch-wrapper">
+              <input type="checkbox" id="secretToggle" />
+              <span class="slider-round"></span>
+            </span>
+          </label>
+        </div>
+
+        <!-- 4-digit PIN Input -->
+        <div class="protection-item pin-input-group">
+          <span class="pin-label">🔑 비밀번호 (4자리):</span>
+          <input type="password" id="pinInput" class="pin-input" placeholder="••••" maxlength="4" inputmode="numeric" />
+          <span class="pin-hint">*수정/삭제/비밀글 열람용</span>
+        </div>
+      </div>
+
+      <!-- Action Button (Single Centered Prominent Button) -->
+      <div class="form-actions-single">
+        <button id="btnSubmitStory" class="btn-primary-burgundy btn-submit-large">
+          <span id="submitBtnIcon">💌</span>
+          <span id="submitBtnText">[매운맛 썰] 털어놓기</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- SECTION 2: BOARD & STORY LIST -->
+    <section class="board-section">
+      <div class="board-header">
+        <!-- TWO MAIN TABS (Dusty Teal vs Burgundy Red) -->
+        <div class="category-tabs-container">
+          <div class="category-tab-btn tab-spicy active" id="tabSpicy" data-tab="spicy">
+            <div class="tab-info-group">
+              <span class="tab-main-label">🔥 매운맛 썰 <small style="font-weight: normal; font-size: 12px;">(일반 하소연)</small></span>
+              <span class="tab-sub-label">답답하고 기막힌 환장 에피소드 & 공감 대나무숲</span>
+            </div>
+            <span class="tab-count-badge" id="spicyCountBadge">0개 사연</span>
+          </div>
+
+          <div class="category-tab-btn tab-sos" id="tabSos" data-tab="sos">
+            <div class="tab-info-group">
+              <span class="tab-main-label">🚨 SOS 안전 상담소 <small style="font-weight: normal; font-size: 12px;">(진지한 고민/도움)</small></span>
+              <span class="tab-sub-label">가스라이팅, 스토킹, 데이트 폭력 안전 조치 가이드</span>
+            </div>
+            <span class="tab-count-badge" id="sosCountBadge">0개 사연</span>
+          </div>
+        </div>
+
+        <!-- Search & Filter Toolbar -->
+        <div class="board-toolbar">
+          <div class="search-input-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchStoryInput" placeholder="사연 내용 또는 키워드 검색..." />
+          </div>
+          <div class="sort-chips">
+            <button class="chip-btn active" data-sort="latest">최신순</button>
+            <button class="chip-btn" data-sort="popular">인기 공감순</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Story Cards Feed -->
+      <div class="story-cards-container" id="storyCardsFeed">
+        <!-- Populated dynamically via app.js -->
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ================= SIDEBAR DRAWER (Slide-in) ================= -->
+<div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+<aside class="sidebar-drawer" id="sidebarDrawer">
+  <button class="sidebar-close-btn" id="btnCloseSidebar" title="설정 닫기">&times;</button>
+  
+  <div class="sidebar-header">
+    <div class="sidebar-brand-badge">
+      <svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="10" fill="#8B1E22"/><path d="M12 6v6l4 2" stroke="#fff" stroke-width="2" fill="none"/></svg>
+      EXCHANGE SETTING
+    </div>
+    <h2 class="sidebar-title">서비스 안내 <span class="accent">(EXChange)</span></h2>
+    <p class="sidebar-desc">환장연애는 안전한 연애 상담과 치유를 위한 익명 플랫폼입니다.</p>
+  </div>
+
+  <div class="step-group" style="margin-top: 10px;">
+    <label class="step-label">
+      <span class="step-num">🛡️</span> 사용자 보호 원칙
+    </label>
+    <div style="background: var(--bg-subtle); padding: 14px; border-radius: 8px; font-size: 12.5px; line-height: 1.6; color: var(--text-main);">
+      1. 모든 사연과 댓글은 <strong>100% 익명</strong>으로 처리됩니다.<br/>
+      2. 비밀글 설정 시 4자리 PIN으로 안전하게 보호됩니다.<br/>
+      3. SOS 안전 상담소 사연은 <strong>긴급 안전 행동 수칙</strong>과 전문 지원 기관(1366)을 즉시 안내합니다.
+    </div>
+  </div>
+
+  <div class="step-group" style="margin-top: 20px;">
+    <label class="step-label">
+      <span class="step-num">⚡</span> 서비스 취지 팝업 다시보기
+    </label>
+    <button class="btn-primary-burgundy" id="btnReopenIntro" style="width: 100%; justify-content: center; font-size: 13px; padding: 10px;">
+      📖 취지 안내 팝업 다시 열기
+    </button>
+  </div>
+
+  <div class="sidebar-footer">
+    <p>환장연애 (EXChange) — 당신의 안전과 행복한 관계를 응원합니다.</p>
+  </div>
+</aside>
+
+<!-- ================= FIXED FLOATING WIDGET 1: 📞 1366 EMERGENCY HOTLINE ================= -->
+<div class="fixed-emergency-widget" id="btnEmergencyWidget">
+  <button class="emergency-button" id="btnOpenEmergencyModal" title="24시간 긴급 안심 상담 연결">
+    <div class="emergency-icon-circle">
+      <span>📞</span>
+    </div>
+    <div class="emergency-text-group">
+      <span class="emergency-top-txt">24시간 긴급 안심 핫라인</span>
+      <span class="emergency-hotline">긴급 상담 1366 / 1393</span>
+    </div>
+  </button>
+</div>
+
+<!-- ================= FIXED FLOATING WIDGET 2: 👑 RED PAPER CROWN ================= -->
+<div class="fixed-floating-crown" id="btnFloatingCrown">
+  <div class="crown-circle-btn">
+    <img src="assets/paper_crown.svg" alt="빨간색 종이 왕관" class="crown-svg-img" />
+  </div>
+  <span class="crown-tooltip">👑 환장연애 퀵메뉴</span>
+</div>
+
+<!-- ================= POPUP 0: INTRO SERVICE PURPOSE MODAL (Auto Popup on entry) ================= -->
+<div class="modal-backdrop intro-modal-backdrop" id="introModal">
+  <div class="modal-dialog intro-modal-box">
+    <button class="modal-close-btn" id="btnCloseIntroModal" title="팝업 닫기">&times;</button>
+    
+    <div style="text-align: center; margin-bottom: 8px;">
+      <span class="intro-badge-pill">🛡️ 안전한 치유와 위로의 공간</span>
+    </div>
+    
+    <h2 class="intro-modal-title">환장연애 — 안전한 치유와 위로의 대나무숲</h2>
+    
+    <div class="intro-modal-body">
+      <p class="intro-main-desc">
+        이곳은 남에게 쉽게 털어놓지 못하고, 내가 겪는 고통이 가스라이팅인지 데이트 폭력인지조차 인지 못한 채 잘못된 연애 속에서 정신적 고통을 받고 있는 분들을 위한 공간입니다.
+      </p>
+      <p class="intro-sub-desc">
+        혼자 앓지 말고 안심하고 마음을 털어놓으세요.<br/>
+        <strong>당신의 안전과 존엄이 최우선입니다.</strong>
+      </p>
+      
+      <div class="intro-guidelines-box">
+        <div class="intro-guide-item">
+          <span class="guide-icon">🔥</span>
+          <div>
+            <b style="color: var(--teal-800); font-size: 13.5px;">매운맛 썰 (일반 하소연)</b>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+              답답하고 기막힌 환장 에피소드를 자유롭게 털어놓고 다른 사람들과 공감과 사이다 위로를 나누세요.
+            </p>
+          </div>
+        </div>
+        <div class="intro-guide-item" style="border-top: 1px dashed var(--border-medium); padding-top: 10px; margin-top: 10px;">
+          <span class="guide-icon">🚨</span>
+          <div>
+            <b style="color: var(--burgundy-800); font-size: 13.5px;">SOS 안전 상담소 (위험 징후)</b>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+              스토킹, 폭력, 가스라이팅 등 위험 신호 감지 시 <strong>긴급 안전 조치 가이드</strong>와 전문 상담 기관(1366)을 연결합니다.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="intro-modal-footer">
+      <label class="intro-hide-today">
+        <input type="checkbox" id="chkHideIntroToday" />
+        <span>오늘 하루 동안 이 창 보지 않기</span>
+      </label>
+      
+      <button class="btn-primary-burgundy btn-intro-enter" id="btnEnterService">
+        <span>이해했습니다. 입장하기 ➔</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL 1: EMERGENCY SAFETY CENTER MODAL ================= -->
+<div class="modal-backdrop" id="emergencyModal">
+  <div class="modal-dialog">
+    <button class="modal-close-btn" id="btnCloseEmergencyModal">&times;</button>
+    <div class="modal-header-icon">🚨</div>
+    <h3 class="modal-title">24시간 긴급 안심 상담 센터</h3>
+    <p class="modal-desc">
+      당신의 안전과 마음 건강이 언제나 최우선입니다. 위급한 상황이거나 혼자 감당하기 힘든 고민이 있다면 지체 없이 전문 상담 기관의 도움을 받으세요.
+    </p>
+
+    <a href="tel:1366" class="emergency-contact-card">
+      <div class="emergency-contact-info">
+        <b>여성긴급전화 (데이트폭력·스토킹·가정폭력)</b>
+        <span>365일 24시간 전국 무료 긴급 전화 상담 및 피난처 연계 지원</span>
+      </div>
+      <span class="emergency-call-tag">📞 국번없이 1366</span>
+    </a>
+
+    <a href="tel:1393" class="emergency-contact-card">
+      <div class="emergency-contact-info">
+        <b>마음건강 위기상담전화</b>
+        <span>극심한 스트레스, 이별 우울감 및 정서적 위기 전문 심리 상담</span>
+      </div>
+      <span class="emergency-call-tag">📞 1393</span>
+    </a>
+
+    <a href="tel:112" class="emergency-contact-card">
+      <div class="emergency-contact-info">
+        <b>경찰청 긴급 범죄 신고</b>
+        <span>신변의 위협이나 즉각적인 물리적 위험 발생 시 출동</span>
+      </div>
+      <span class="emergency-call-tag" style="background: #d32f2f;">🚨 112 신고</span>
+    </a>
+
+    <div class="quick-exit-bar">
+      <span style="font-size: 11.5px; color: var(--text-muted);">화면을 즉시 숨겨야 할 때:</span>
+      <button class="btn-quick-exit" id="btnQuickExit">⚡ 빠른 화면 탈출 (네이버로 전환)</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL 2: PIN UNLOCK MODAL ================= -->
+<div class="modal-backdrop" id="pinModal">
+  <div class="modal-dialog" style="max-width: 380px; text-align: center;">
+    <button class="modal-close-btn" id="btnClosePinModal">&times;</button>
+    <div class="modal-header-icon" style="margin: 0 auto 12px;">🔒</div>
+    <h3 class="modal-title">비밀글 열람</h3>
+    <p class="modal-desc">작성 시 설정한 4자리 비밀번호를 입력해주세요.</p>
+    <div style="margin: 16px 0;">
+      <input type="password" id="unlockPinInput" class="pin-input" placeholder="••••" maxlength="4" style="width: 130px; font-size: 20px; padding: 10px;" />
+    </div>
+    <button id="btnConfirmPin" class="btn-primary-burgundy" style="width: 100%; justify-content: center;">열람 확인</button>
+  </div>
+</div>
+
+<!-- ================= MODAL 3: STORY DETAIL MODAL ================= -->
+<div class="modal-backdrop" id="storyDetailModal">
+  <div class="modal-dialog" style="max-width: 600px;">
+    <button class="modal-close-btn" id="btnCloseDetailModal">&times;</button>
+    <div id="detailModalContent">
+      <!-- Populated via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODAL 4: CROWN QUICK MENU ================= -->
+<div class="modal-backdrop" id="crownMenuModal">
+  <div class="modal-dialog" style="max-width: 440px;">
+    <button class="modal-close-btn" id="btnCloseCrownModal">&times;</button>
+    <div class="modal-header-icon">👑</div>
+    <h3 class="modal-title">환장연애 라운지 퀵메뉴</h3>
+    <p class="modal-desc">안전한 치유와 빠른 바로가기 메뉴입니다.</p>
+
+    <div style="background: var(--burgundy-50); border: 1px solid rgba(153,28,34,0.2); border-radius: 12px; padding: 16px; margin-bottom: 18px;">
+      <b style="font-size: 13px; color: var(--burgundy-800); display: block; margin-bottom: 4px;">🛡️ 안전 대나무숲 한마디</b>
+      <p style="font-size: 13.5px; font-family: var(--font-serif); color: var(--text-main); line-height: 1.5;">
+        "잘못된 관계에서 벗어나는 것은 실패가 아니라, 당신의 삶과 존엄을 되찾는 가장 용기 있는 첫걸음입니다."
+      </p>
+    </div>
+
+    <button class="btn-primary-burgundy" style="width: 100%; margin-bottom: 10px;" id="btnQuickWrite">
+      ✍️ 새 사연 바로 작성하기
+    </button>
+    <button class="btn-secondary-outline" style="width: 100%; padding: 12px; border-radius: 8px; border: 1.5px solid var(--teal-600); background: #fff; color: var(--teal-800); font-weight: 700; cursor: pointer;" id="btnQuickEmergency">
+      📞 긴급 안심 핫라인 (1366) 열기
+    </button>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
