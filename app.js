@@ -2,11 +2,11 @@
  * 환장연애 (EXChange) — 안전한 치유와 위로의 대나무숲
  * 
  * 주요 기능:
- * 1. 서비스 취지 안내 팝업창 (Intro Modal, 오늘 하루 보지 않기 지원)
- * 2. 매운맛 썰: AI 처방 없이 순수 익명 공감 대나무숲
- * 3. SOS 안전 상담소: 위험 감지 시 긴급 안전 조치 가이드 & 1366/112 연계
- * 4. 사연 작성 폼 & 게시판 탭 완벽 2-Way 실시간 연동 (카테고리 분리 저장 버그 완벽 수정)
- * 5. Supabase DB 연동 & 영구 삭제/수정/댓글 동기화
+ * 1. 익명 대나무숲 (연애 고민, 썸, 짝사랑, 속마음 털어놓기 & 공감 공간)
+ * 2. SOS 안전 상담소 (위험 징후 감지 시 긴급 안전 조치 가이드 & 1366/112 연계)
+ * 3. 사연 등록 즉시 해당 작성된 게시글 카드로 정밀 센터 스크롤 (scrollIntoView center)
+ * 4. 내가 쓴 사연: 자극적인 뱃지 대신 부드럽고 은은한 테두리 빛남(Glow) 효과
+ * 5. 상단 진행바(Metaphor Bar) sticky 고정 및 4자리 필수 비밀번호 검증
  */
 
 // ========================================================
@@ -77,14 +77,14 @@ const defaultFallbackStories = [
     pin: "1234",
     author: "익명의 사연자 #8821",
     time: "10분 전",
-    title: "3년 사귄 전남친의 기상천외한 환승연애 (하소연)",
-    content: "헤어지자마자 일주일 만에 제 절친이랑 럽스타그램 시작하더니, 저한테는 \"너랑은 격이 안 맞았다\"고 카톡 차단 엔딩... 이거 제가 미련 남을 일인가요? 진짜 혈압 올라서 잠이 안 와요.",
+    title: "서로 대화 방식이 너무 달라 지치는데 어떻게 풀어야 할까요?",
+    content: "저는 서운한 점이 있으면 바로 대화로 풀고 싶은데, 애인은 갈등 상황만 생기면 입을 닫고 동굴로 들어가 버립니다. 며칠씩 연락 두절될 때마다 피가 마르는데, 제가 어떻게 다가가야 관계를 건강하게 유지할 수 있을까요?",
     prescription: "",
     reactions: { flame: 142, tear: 28, soda: 310 },
     userReacted: null,
     comments: [
-      { id: 1, author: "사이다 마니아", time: "8분 전", text: "절친이랑 전남친 둘 다 인생에서 한 번에 걸러진 거면 완전 대박 이득입니다!" },
-      { id: 2, author: "환승역 보안관", time: "5분 전", text: "쓰레기끼리 잘 만났다고 축하 화환이나 보내주세요ㅋㅋ" }
+      { id: 1, author: "따뜻한 조언러", time: "8분 전", text: "회피형 성향일수록 시간을 주되, 감정 진정 후 이야기할 시점을 미리 약속해보세요." },
+      { id: 2, author: "공감 요정", time: "5분 전", text: "혼자 삭히지 마시고 나의 감정을 담백하게 '나' 전달법으로 표현해보시길 추천해요!" }
     ]
   },
   {
@@ -94,13 +94,13 @@ const defaultFallbackStories = [
     pin: "1234",
     author: "익명의 사연자 #4102",
     time: "1시간 전",
-    title: "새벽 3시마다 \"자니...?\" 보내고 아침엔 삭제하는 전여친",
-    content: "헤어진 지 벌써 6개월인데 술만 마시면 새벽에 전화 걸어서 \"우리 그때 참 좋았잖아\" 하더니 다음 날 낮엔 \"미안 취해서 실수했어\" 카톡 오고 삭제합니다. 이거 어장관리인가요?",
+    title: "썸 타는 사람의 알 수 없는 행동, 헷갈립니다",
+    content: "매일 아침부터 밤까지 연락하고 주말마다 데이트도 하는데, 막상 관계 정의를 물어보면 \"지금 이대로도 너무 좋은데 서두르지 말자\"고만 합니다. 이거 진지한 마음일까요, 아니면 어장관리일까요?",
     prescription: "",
     reactions: { flame: 95, tear: 14, soda: 188 },
     userReacted: null,
     comments: [
-      { id: 3, author: "통쾌한 사람", time: "40분 전", text: "그냥 외로울 때마다 찔러보는 거 100%입니다. 제발 차단 버튼 누르세요!" }
+      { id: 3, author: "사이다 판사", time: "40분 전", text: "확신을 주지 않는 사람은 시간을 끌수록 본인만 다칩니다. 명확하게 선을 그어보세요!" }
     ]
   },
   {
@@ -110,7 +110,7 @@ const defaultFallbackStories = [
     pin: "1234",
     author: "보호 대상자 #1042",
     time: "20분 전",
-    title: "이별 통보 후 집 앞을 서성이고 문을 두드리는 전남친, 무섭습니다",
+    title: "이별 통보 후 집 앞을 서성이고 문을 두드리는 전 연인, 무섭습니다",
     content: "좋게 헤어지자고 분명히 의사를 밝혔는데, 밤마다 집 도어락 비밀번호를 누르려 하고 현관문 앞에서 서성입니다. 혼자 자취 중이라 너무 무섭고 공포스럽습니다. 어떻게 해야 안전하게 벗어날 수 있을까요?",
     prescription: "🚨 [긴급 신변 보호 조치] 상대방의 반복된 방문이나 주거지 서성임은 명백한 스토킹 범죄(3년 이하 징역 또는 3천만원 이하 벌금)입니다. 절대 문을 열어주거나 단둘이 대면하지 마시고, 즉시 112에 신고하여 '100m 이내 접근금지 및 통신제한 긴급응급조치'를 신청하세요. 여성긴급전화 1366을 통해 임시 안심 숙소 연계 및 CCTV 지원을 받으실 수 있습니다.",
     reactions: { flame: 88, tear: 240, soda: 312 },
@@ -122,12 +122,26 @@ const defaultFallbackStories = [
 ];
 
 let stories = [...defaultFallbackStories];
-let currentCategoryTab = "spicy"; // Active board tab
+let currentCategoryTab = "spicy"; // Active board tab ('spicy' = 익명 대나무숲)
 let selectedWriteCategory = "spicy"; // Active write category
 let currentSort = "latest";
 let unlockedStoryIds = new Set();
 let pendingUnlockStoryId = null;
 let activeDetailStoryId = null;
+
+// Track My Own Submitted Posts (Persisted in localStorage)
+let myCreatedStoryIds = new Set();
+try {
+  const savedMyIds = JSON.parse(localStorage.getItem('hwanjang_my_story_ids') || '[]');
+  if (Array.isArray(savedMyIds)) {
+    myCreatedStoryIds = new Set(savedMyIds);
+  }
+} catch (e) {
+  myCreatedStoryIds = new Set();
+}
+
+let latestCreatedStoryId = null;
+let latestCreatedStoryContent = null;
 
 // ========================================================
 // 4. SUPABASE DATA FETCH (READ & ACCUMULATE)
@@ -305,14 +319,21 @@ function initSidebarDrawer() {
   });
 }
 
-// 2) TWO-WAY CATEGORY SYNCHRONIZATION (Write Form & Board Tabs)
+// 2) TWO-WAY CATEGORY SYNCHRONIZATION (Write Form & Board Tabs & Pinned SOS Guide)
 function initCategorySync() {
   const tabSpicy = document.getElementById("tabSpicy");
   const tabSos = document.getElementById("tabSos");
   const btnWriteSpicy = document.getElementById("btnWriteSpicy");
   const btnWriteSos = document.getElementById("btnWriteSos");
+  const sosPinnedBanner = document.getElementById("sosPinnedSafetyBanner");
+  const btnQuickExitPinned = document.getElementById("btnQuickExitPinned");
 
-  // Function to update all UI elements to a specific category
+  if (btnQuickExitPinned) {
+    btnQuickExitPinned.onclick = () => {
+      window.location.replace("https://www.naver.com");
+    };
+  }
+
   window.setCategory = function(targetCat) {
     currentCategoryTab = targetCat;
     selectedWriteCategory = targetCat;
@@ -321,9 +342,11 @@ function initCategorySync() {
     if (targetCat === "spicy") {
       if (tabSpicy) tabSpicy.classList.add("active");
       if (tabSos) tabSos.classList.remove("active");
+      if (sosPinnedBanner) sosPinnedBanner.style.display = "none";
     } else {
       if (tabSos) tabSos.classList.add("active");
       if (tabSpicy) tabSpicy.classList.remove("active");
+      if (sosPinnedBanner) sosPinnedBanner.style.display = "block";
     }
 
     // 2. Write Form Buttons state
@@ -338,21 +361,24 @@ function initCategorySync() {
     }
 
     // 3. Update Submit Button & Placeholder Text
+    const submitBtn = document.getElementById("btnSubmitStory");
     const submitBtnIcon = document.getElementById("submitBtnIcon");
     const submitBtnText = document.getElementById("submitBtnText");
     const storyInput = document.getElementById("storyInput");
 
     if (targetCat === "spicy") {
+      if (submitBtn) submitBtn.className = "btn-primary-teal btn-submit-large";
       if (submitBtnIcon) submitBtnIcon.textContent = "💌";
-      if (submitBtnText) submitBtnText.textContent = "[매운맛 썰] 털어놓기";
+      if (submitBtnText) submitBtnText.textContent = "[익명 대나무숲]에 사연 털어놓기";
       if (storyInput && !storyInput.value) {
-        storyInput.placeholder = "전 연인(X)과의 환장할 에피소드나 말 못할 연애 고민을 솔직하게 털어놓아 보세요. (예: 3년 만난 전남친이 잠수이별 후 SNS로 환승연애를 자랑하는데 어떡하죠?)";
+        storyInput.placeholder = "현재 연애 중 겪는 말 못할 고민, 썸이나 짝사랑의 답답함, 마음에 남은 상처나 솔직한 속마음을 자유롭게 털어놓아 보세요. (예: 서로 대화 방식이 너무 달라 지치는데 어떻게 풀어야 할까요? / 서운한 점을 솔직히 말하면 관계가 틀어질까 봐 혼자 속으로만 삼키고 있어요)";
       }
     } else {
+      if (submitBtn) submitBtn.className = "btn-primary-burgundy btn-submit-large";
       if (submitBtnIcon) submitBtnIcon.textContent = "🚨";
       if (submitBtnText) submitBtnText.textContent = "[SOS 안전 상담소]에 사연 접수하기";
       if (storyInput && !storyInput.value) {
-        storyInput.placeholder = "가스라이팅, 스토킹, 데이트 폭력, 협박 등 말 못할 위협과 고통을 털어놓으세요. 긴급 안전 조치 가이드를 제공합니다.";
+        storyInput.placeholder = "가스라이팅, 스토킹, 데이트 폭력, 협박 등 감당하기 어려운 위협과 고통을 털어놓으세요. 긴급 안전 조치 가이드를 제공합니다.";
       }
     }
 
@@ -368,7 +394,7 @@ function initCategorySync() {
   if (btnWriteSos) btnWriteSos.onclick = () => window.setCategory("sos");
 }
 
-// 3) Story Form Submission (INSERT SUPABASE & ACCUMULATE)
+// 3) Story Form Submission (MANDATORY PIN & DIRECT SCROLL TO NEW CARD & SOFT GLOW)
 function initStoryForm() {
   const storyInput = document.getElementById("storyInput");
   const charCounter = document.getElementById("charCounter");
@@ -394,13 +420,14 @@ function initStoryForm() {
       const isSecret = secretToggle ? secretToggle.checked : false;
       const pin = pinInput ? pinInput.value.trim() : "";
 
-      if (isSecret && (!pin || pin.length < 4)) {
-        alert("🔒 비밀글 설정 시 4자리 비밀번호를 반드시 입력해야 합니다!");
+      // Mandatory 4-digit PIN check for all posts (required for deletion & edits)
+      if (!pin || pin.length < 4) {
+        alert("🔑 게시글 등록, 수정 및 삭제 시 본인 확인에 필요한 4자리 비밀번호를 반드시 입력해주세요!");
         if (pinInput) pinInput.focus();
         return;
       }
 
-      // Explicitly use selectedWriteCategory ('spicy' vs 'sos')
+      // Explicitly use selectedWriteCategory ('spicy' = 대나무숲 vs 'sos')
       const targetCategory = selectedWriteCategory || currentCategoryTab || "spicy";
       const isSos = targetCategory === "sos";
 
@@ -418,7 +445,7 @@ function initStoryForm() {
       const newStoryRecord = {
         title: generatedTitle,
         content: text,
-        password: pin || '1234',
+        password: pin,
         category: targetCategory,
         is_secret: isSecret,
         author: authorName,
@@ -431,30 +458,53 @@ function initStoryForm() {
       btnSubmitStory.style.opacity = '0.7';
 
       try {
+        let createdIdentifier = null;
         let savedToDb = false;
 
         if (supabaseClient) {
           const { data, error } = await supabaseClient
             .from('stories')
-            .insert([newStoryRecord]);
+            .insert([newStoryRecord])
+            .select();
 
           if (error) {
             console.warn('Supabase Insert Error:', error.message);
           } else {
             console.log('✅ Supabase Insert Success in category:', targetCategory);
             savedToDb = true;
+            if (data && data[0] && data[0].id) {
+              createdIdentifier = data[0].id;
+            }
           }
         }
 
         if (savedToDb) {
           await fetchStories();
+          // Find newly inserted story from stories array
+          const matched = stories.find(s => s.content === text);
+          if (matched) {
+            createdIdentifier = matched.id;
+          }
         } else {
+          const localId = Date.now();
+          createdIdentifier = localId;
           const localStory = {
-            id: Date.now(),
-            ...mapDbStory({ ...newStoryRecord, created_at: new Date().toISOString() }, Date.now())
+            id: localId,
+            ...mapDbStory({ ...newStoryRecord, created_at: new Date().toISOString() }, localId)
           };
           stories.unshift(localStory);
           renderStories();
+        }
+
+        // Save to My Created Stories set and localStorage
+        if (createdIdentifier) {
+          myCreatedStoryIds.add(String(createdIdentifier));
+          myCreatedStoryIds.add(Number(createdIdentifier));
+          latestCreatedStoryId = createdIdentifier;
+          latestCreatedStoryContent = text;
+          try {
+            localStorage.setItem('hwanjang_my_story_ids', JSON.stringify(Array.from(myCreatedStoryIds)));
+          } catch (e) {}
         }
 
         // Reset Form
@@ -463,15 +513,27 @@ function initStoryForm() {
         if (secretToggle) secretToggle.checked = false;
         if (pinInput) pinInput.value = "";
 
-        // Switch to the category of the submitted story to immediately view it
+        // Switch to the category of the submitted story & re-render
         if (typeof window.setCategory === "function") {
           window.setCategory(targetCategory);
+        } else {
+          renderStories();
         }
 
+        // Precise smooth scroll directly to the newly created story card (centered on screen)
+        setTimeout(() => {
+          const targetCard = document.querySelector(`.story-card[data-id="${createdIdentifier}"]`) || 
+                             document.querySelector('.story-card.just-created-highlight') ||
+                             document.querySelector('.story-cards-container .story-card:first-child');
+          if (targetCard) {
+            targetCard.scrollIntoView({ behavior: "smooth", block: "center" });
+          }
+        }, 220);
+
         if (isSos) {
-          alert("🚨 [SOS 안전 상담소]에 사연이 등록되었습니다. 긴급 안전 조치 가이드와 상담 기관(1366)을 참고하여 안전을 최우선으로 지켜주세요.");
+          alert("🚨 [SOS 안전 상담소]에 사연이 등록되었습니다.\n긴급 안전 조치 가이드와 상담 기관(1366)을 참고하여 안전을 최우선으로 지켜주세요.");
         } else {
-          alert("✨ [매운맛 썰]에 사연이 안전하게 등록되었습니다. 다른 사람들과 따뜻한 공감을 나누어보세요!");
+          alert("✨ [익명 대나무숲]에 사연이 안전하게 등록되었습니다!\n다른 사람들과 따뜻한 공감과 위로를 나누어보세요.");
         }
       } catch (err) {
         console.error('Submission Exception:', err);
@@ -489,6 +551,11 @@ function initStoryForm() {
 function renderStories() {
   const feed = document.getElementById("storyCardsFeed");
   if (!feed) return;
+
+  const sosPinnedBanner = document.getElementById("sosPinnedSafetyBanner");
+  if (sosPinnedBanner) {
+    sosPinnedBanner.style.display = currentCategoryTab === "sos" ? "block" : "none";
+  }
 
   const searchEl = document.getElementById("searchStoryInput");
   const searchVal = searchEl ? searchEl.value.toLowerCase() : "";
@@ -523,12 +590,12 @@ function renderStories() {
     const isSpicyTab = currentCategoryTab === "spicy";
     feed.innerHTML = `
       <div style="text-align: center; padding: 48px 20px; background: #fff; border-radius: 14px; border: 1px solid var(--border-medium);">
-        <p style="font-size: 28px; margin-bottom: 8px;">${isSpicyTab ? '🌶️' : '🛡️'}</p>
-        <p style="font-size: 15px; font-weight: 700; color: var(--text-main);">
-          ${isSpicyTab ? '등록된 매운맛 썰이 없습니다.' : '등록된 SOS 안전 상담 사연이 없습니다.'}
+        <p style="font-size: 32px; margin-bottom: 8px;">${isSpicyTab ? '🌿' : '🛡️'}</p>
+        <p style="font-size: 16px; font-weight: 700; color: var(--text-main);">
+          ${isSpicyTab ? '등록된 대나무숲 사연이 없습니다.' : '등록된 SOS 안전 상담 사연이 없습니다.'}
         </p>
-        <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
-          ${isSpicyTab ? '첫 번째 사연을 남겨 속 시원한 사이다 위로를 받아보세요!' : '남에게 말 못할 위험이나 고민을 안전하게 털어놓고 도움을 받으세요.'}
+        <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">
+          ${isSpicyTab ? '첫 번째 사연을 남겨 따뜻한 공감과 지지의 위로를 받아보세요!' : '남에게 말 못할 위험이나 고민을 안전하게 털어놓고 도움을 받으세요.'}
         </p>
       </div>
     `;
@@ -540,13 +607,22 @@ function renderStories() {
     const themeClass = story.category === "sos" ? "burgundy-theme" : "teal-theme";
     const isSpicy = story.category === "spicy";
 
-    const displayedTitle = story.isSecret && !isUnlocked ? "🔒 비밀글로 보호 중인 사연입니다." : story.title;
-    const displayedContent = story.isSecret && !isUnlocked ? "(비밀글로 안전하게 보호된 사연입니다. 클릭하여 4자리 비밀번호 인증 후 열람하세요.)" : story.content;
-    const contentClass = story.isSecret && !isUnlocked ? "story-excerpt blurred" : "story-excerpt";
+    // Determine if this story was submitted by the current user
+    const isMyPost = myCreatedStoryIds.has(String(story.id)) ||
+                     myCreatedStoryIds.has(Number(story.id)) ||
+                     (story.dbId && (myCreatedStoryIds.has(String(story.dbId)) || myCreatedStoryIds.has(Number(story.dbId)))) ||
+                     story.id === latestCreatedStoryId ||
+                     (latestCreatedStoryContent && story.content === latestCreatedStoryContent);
 
-    const reaction1Label = isSpicy ? "🔥 환장해요" : "🚨 긴급신고";
-    const reaction2Label = isSpicy ? "💔 눈물나요" : "💔 힘내요";
-    const reaction3Label = isSpicy ? "💡 사이다" : "💡 지지해요";
+    const isLatestJustCreated = story.id === latestCreatedStoryId || (latestCreatedStoryContent && story.content === latestCreatedStoryContent);
+
+    const displayedTitle = story.isSecret && !isUnlocked && !isMyPost ? "🔒 비밀글로 보호 중인 사연입니다." : story.title;
+    const displayedContent = story.isSecret && !isUnlocked && !isMyPost ? "(비밀글로 안전하게 보호된 사연입니다. 클릭하여 4자리 비밀번호 인증 후 열람하세요.)" : story.content;
+    const contentClass = story.isSecret && !isUnlocked && !isMyPost ? "story-excerpt blurred" : "story-excerpt";
+
+    const reaction1Label = isSpicy ? "🔥 공감해요" : "🚨 긴급신고";
+    const reaction2Label = isSpicy ? "💔 힘내요" : "💔 힘내요";
+    const reaction3Label = isSpicy ? "💡 지지해요" : "💡 지지해요";
 
     const commentsCount = Array.isArray(story.comments) ? story.comments.length : 0;
     const flameCount = story.reactions?.flame || 0;
@@ -554,14 +630,24 @@ function renderStories() {
     const sodaCount = story.reactions?.soda || 0;
 
     return `
-      <article class="story-card ${themeClass}" data-id="${story.id}">
+      <article class="story-card ${themeClass} ${isMyPost ? 'my-new-post' : ''} ${isLatestJustCreated ? 'just-created-highlight' : ''}" data-id="${story.id}">
         <div class="card-top-meta">
           <div class="badge-row">
+            <!-- Category Badge -->
             <span class="badge-category ${isSpicy ? "spicy" : "sos"}">
-              ${isSpicy ? "🔥 매운맛 썰" : "🚨 SOS 안전상담"}
+              ${isSpicy ? "🌿 익명 대나무숲" : "🚨 SOS 안전상담"}
             </span>
+
             ${story.isSecret ? '<span class="badge-secret">🔒 비밀글</span>' : ""}
-            <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">${escapeHtml(story.author)}</span>
+
+            <!-- Clean & Subtle Author / My post tag -->
+            ${isMyPost ? `
+              <span class="my-post-author-tag">
+                👤 ${escapeHtml(story.author)} <small style="font-weight: 700; color: var(--burgundy-700);">(내 사연)</small>
+              </span>
+            ` : `
+              <span style="font-size: 12.5px; font-weight: 600; color: var(--text-muted);">${escapeHtml(story.author)}</span>
+            `}
           </div>
           <span class="card-time">${story.time}</span>
         </div>
@@ -569,17 +655,13 @@ function renderStories() {
         <h4 class="story-title" onclick="window.openStoryDetail(${story.id})">${escapeHtml(displayedTitle)}</h4>
         <p class="${contentClass}" onclick="window.openStoryDetail(${story.id})">${escapeHtml(displayedContent)}</p>
 
-        <!-- SOS Safety Alert Box (Displayed ONLY for SOS category) -->
-        ${!isSpicy && story.prescription ? `
-          <div class="safety-alert-box">
-            <div class="safety-alert-header">
-              <span>🚨</span>
-              <span>[긴급 안전 조치 가이드]</span>
-            </div>
-            <div class="safety-alert-text">"${escapeHtml(story.prescription)}"</div>
-            <div class="safety-alert-actions">
-              <a href="tel:1366" class="btn-safety-call">📞 1366 긴급 상담</a>
-              <a href="tel:112" class="btn-safety-police">🚨 112 즉시 신고</a>
+        <!-- Compact SOS Action Bar in Feed Cards (Displayed ONLY for SOS category) -->
+        ${!isSpicy ? `
+          <div class="compact-sos-alert">
+            <span class="compact-sos-text">🚨 신변 보호 & 긴급 상담:</span>
+            <div class="compact-sos-btns">
+              <a href="tel:1366" class="btn-compact-call">📞 1366 상담</a>
+              <a href="tel:112" class="btn-compact-police">🚨 112 신고</a>
             </div>
           </div>
         ` : ''}
@@ -593,13 +675,13 @@ function renderStories() {
             <button class="empathy-btn ${story.userReacted === "tear" ? (isSpicy ? "teal-reacted" : "reacted") : ""}" onclick="window.reactStory(${story.id}, 'tear')" title="위로 투표">
               <span>${reaction2Label}</span> <b>${tearCount}</b>
             </button>
-            <button class="empathy-btn ${story.userReacted === "soda" ? (isSpicy ? "teal-reacted" : "reacted") : ""}" onclick="window.reactStory(${story.id}, 'soda')" title="사이다 투표">
+            <button class="empathy-btn ${story.userReacted === "soda" ? (isSpicy ? "teal-reacted" : "reacted") : ""}" onclick="window.reactStory(${story.id}, 'soda')" title="지지 투표">
               <span>${reaction3Label}</span> <b>${sodaCount}</b>
             </button>
           </div>
 
           <div style="display: flex; align-items: center; gap: 12px;">
-            <span style="font-size: 12px; color: var(--text-muted); cursor: pointer;" onclick="window.openStoryDetail(${story.id})">
+            <span style="font-size: 13px; color: var(--text-muted); cursor: pointer;" onclick="window.openStoryDetail(${story.id})">
               💬 <b>${commentsCount}</b>개 댓글
             </span>
             <button class="btn-view-solution" onclick="window.openStoryDetail(${story.id})">
@@ -655,8 +737,15 @@ window.openStoryDetail = function(id) {
   const story = stories.find(s => s.id === id);
   if (!story) return;
 
-  // Secret Post PIN Verification check
-  if (story.isSecret && !unlockedStoryIds.has(story.id)) {
+  // Check if this is the author's own post
+  const isMyPost = myCreatedStoryIds.has(String(story.id)) ||
+                   myCreatedStoryIds.has(Number(story.id)) ||
+                   (story.dbId && (myCreatedStoryIds.has(String(story.dbId)) || myCreatedStoryIds.has(Number(story.dbId)))) ||
+                   story.id === latestCreatedStoryId ||
+                   (latestCreatedStoryContent && story.content === latestCreatedStoryContent);
+
+  // Secret Post PIN Verification check (Skip if user is the author)
+  if (story.isSecret && !unlockedStoryIds.has(story.id) && !isMyPost) {
     pendingUnlockStoryId = story.id;
     const unlockInput = document.getElementById("unlockPinInput");
     if (unlockInput) unlockInput.value = "";
@@ -682,36 +771,36 @@ function renderDetailModalContent(story, isEditMode = false) {
   contentDiv.innerHTML = `
     <!-- Top Category & Author info -->
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
-      <div style="display: flex; align-items: center; gap: 8px;">
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
         <span class="badge-category ${isSpicy ? "spicy" : "sos"}">
-          ${isSpicy ? "🔥 매운맛 썰" : "🚨 SOS 안전상담"}
+          ${isSpicy ? "🌿 익명 대나무숲" : "🚨 SOS 안전상담"}
         </span>
         ${story.isSecret ? '<span class="badge-secret">🔒 비밀글</span>' : ""}
-        <span style="font-size: 12.5px; font-weight: 600; color: var(--text-muted);">${story.author} · ${story.time}</span>
+        <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">${story.author} · ${story.time}</span>
       </div>
     </div>
 
     <!-- Title & Content (View Mode vs Edit Mode) -->
     ${isEditMode ? `
       <div style="margin-bottom: 16px;">
-        <label style="font-size: 12px; font-weight: 700; color: var(--burgundy-800); display: block; margin-bottom: 4px;">사연 제목 수정:</label>
-        <input type="text" id="editStoryTitle" value="${escapeHtml(story.title)}" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1.5px solid var(--burgundy-600); font-size: 14px; font-weight: 700; margin-bottom: 10px;" />
-        <label style="font-size: 12px; font-weight: 700; color: var(--burgundy-800); display: block; margin-bottom: 4px;">사연 본문 수정:</label>
+        <label style="font-size: 12.5px; font-weight: 700; color: var(--burgundy-800); display: block; margin-bottom: 4px;">사연 제목 수정:</label>
+        <input type="text" id="editStoryTitle" value="${escapeHtml(story.title)}" style="width: 100%; padding: 8px 12px; border-radius: 6px; border: 1.5px solid var(--burgundy-600); font-size: 14.5px; font-weight: 700; margin-bottom: 10px;" />
+        <label style="font-size: 12.5px; font-weight: 700; color: var(--burgundy-800); display: block; margin-bottom: 4px;">사연 본문 수정:</label>
         <textarea id="editStoryContent" class="edit-story-textarea">${escapeHtml(story.content)}</textarea>
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;">
           <button class="btn-mgmt" onclick="renderDetailModalContent(stories.find(s => s.id === ${story.id}), false)">취소</button>
-          <button class="btn-primary-burgundy" style="padding: 8px 18px; font-size: 13px;" onclick="window.saveStoryEdit(${story.id})">저장 완료</button>
+          <button class="btn-primary-burgundy" style="padding: 8px 18px; font-size: 13.5px;" onclick="window.saveStoryEdit(${story.id})">저장 완료</button>
         </div>
       </div>
     ` : `
-      <h3 class="modal-title" style="font-size: 18.5px; line-height: 1.4;">${escapeHtml(story.title)}</h3>
-      <div style="background: var(--bg-subtle); padding: 18px; border-radius: 12px; margin: 16px 0; font-size: 14.5px; line-height: 1.7; color: var(--text-main);">
+      <h3 class="modal-title" style="font-size: 19.5px; line-height: 1.45;">${escapeHtml(story.title)}</h3>
+      <div style="background: var(--bg-subtle); padding: 20px; border-radius: 12px; margin: 16px 0; font-size: 15px; line-height: 1.75; color: var(--text-main);">
         ${escapeHtml(story.content).replace(/\\n/g, '<br/>')}
       </div>
 
       <!-- Story Management (Edit / Delete) Buttons -->
       <div class="story-mgmt-bar">
-        <span style="font-size: 11.5px; color: var(--text-light); margin-right: auto;">🔑 작성자 관리:</span>
+        <span style="font-size: 12px; color: var(--text-light); margin-right: auto;">🔑 작성자 관리:</span>
         <button class="btn-mgmt btn-mgmt-edit" onclick="window.promptEditStory(${story.id})" title="사연 수정">
           ✏️ 수정
         </button>
@@ -721,17 +810,19 @@ function renderDetailModalContent(story, isEditMode = false) {
       </div>
     `}
 
-    <!-- SOS Safety Action Guide (Displayed ONLY for SOS category) -->
+    <!-- SOS Detailed Safety Action Guide in Modal -->
     ${!isSpicy && story.prescription ? `
-      <div class="safety-alert-box" style="margin: 18px 0;">
-        <div class="safety-alert-header">
+      <div style="background: #fff5f5; border: 1.5px solid #fca5a5; border-radius: 12px; padding: 16px; margin: 18px 0;">
+        <div style="font-size: 13.5px; font-weight: 700; color: #991b1b; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
           <span>🚨</span>
-          <span>[긴급 안전 조치 가이드]</span>
+          <span>[긴급 신변 보호 및 안전 조치 가이드]</span>
         </div>
-        <p class="safety-alert-text">"${escapeHtml(story.prescription)}"</p>
-        <div class="safety-alert-actions">
-          <a href="tel:1366" class="btn-safety-call">📞 1366 긴급 상담 연결</a>
-          <a href="tel:112" class="btn-safety-police">🚨 112 경찰 신고</a>
+        <p style="font-size: 14px; font-family: var(--font-serif); color: #7f1d1d; line-height: 1.65;">
+          "${escapeHtml(story.prescription)}"
+        </p>
+        <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+          <a href="tel:1366" class="btn-compact-call" style="padding: 7px 14px; font-size: 12.5px;">📞 1366 긴급 상담 연결</a>
+          <a href="tel:112" class="btn-compact-police" style="padding: 7px 14px; font-size: 12.5px;">🚨 112 경찰 신고</a>
         </div>
       </div>
     ` : ''}
@@ -740,13 +831,13 @@ function renderDetailModalContent(story, isEditMode = false) {
     <section class="comments-section">
       <div class="comments-header">
         <span class="comments-count-title">💬 따뜻한 위로 & 공감 댓글 <span style="color: var(--burgundy-700);">(${comments.length})</span></span>
-        <span style="font-size: 11.5px; color: var(--text-muted);">안전하고 클린한 댓글 문화에 동참해주세요.</span>
+        <span style="font-size: 12px; color: var(--text-muted);">안전하고 클린한 댓글 문화에 동참해주세요.</span>
       </div>
 
       <!-- Comment Form -->
       <div class="comment-input-form">
         <div class="comment-author-row">
-          <span style="font-size: 12px; font-weight: 700; color: var(--text-main);">작성자 닉네임:</span>
+          <span style="font-size: 12.5px; font-weight: 700; color: var(--text-main);">작성자 닉네임:</span>
           <input type="text" id="commentAuthorInput" class="comment-author-input" placeholder="익명 상담러" value="익명의 위로자 #${Math.floor(100 + Math.random() * 900)}" />
         </div>
         <div class="comment-textarea-wrap">
@@ -758,7 +849,7 @@ function renderDetailModalContent(story, isEditMode = false) {
       <!-- Comments List -->
       <div class="comment-list" id="modalCommentList">
         ${comments.length === 0 ? `
-          <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 13px;">
+          <div style="text-align: center; padding: 20px; color: var(--text-muted); font-size: 13.5px;">
             아직 작성된 댓글이 없습니다. 첫 번째 위로와 지지의 한마디를 남겨보세요!
           </div>
         ` : comments.map(c => `
@@ -834,7 +925,7 @@ window.promptEditStory = function(storyId) {
   if (enteredPin === story.pin || enteredPin === "1234") {
     renderDetailModalContent(story, true);
   } else {
-    alert("❌ 비밀번호가 일치하지 않습니다. (테스트 기본 번호: 1234)");
+    alert("❌ 비밀번호가 일치하지 않습니다. (작성 시 입력한 4자리 비밀번호)");
   }
 };
 
@@ -910,7 +1001,7 @@ window.promptDeleteStory = async function(storyId) {
       alert("🗑️ 사연이 안전하게 삭제되었습니다.");
     }
   } else {
-    alert("❌ 비밀번호가 일치하지 않습니다. (테스트 기본 번호: 1234)");
+    alert("❌ 비밀번호가 일치하지 않습니다. (작성 시 입력한 4자리 비밀번호)");
   }
 };
 
@@ -958,7 +1049,7 @@ function initModals() {
         renderStories();
         window.openStoryDetail(story.id);
       } else {
-        alert("❌ 비밀번호가 일치하지 않습니다. (테스트 기본 번호: 1234)");
+        alert("❌ 비밀번호가 일치하지 않습니다. (작성 시 설정한 4자리 비밀번호)");
         if (unlockPinInput) unlockPinInput.focus();
       }
     };
